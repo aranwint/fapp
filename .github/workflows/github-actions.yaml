@@ -47,39 +47,38 @@ jobs:
       ### - name: Exporting ipa
       ###   run: xcodebuild -exportArchive -archivePath build/fapp.xcarchive -exportOptionsPlist ios/ExportOptions.plist -exportPath build-ipa/fapp.ipa
 
-      # - name: Publishing iOS artefacts for signing and releasing later
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: fapp-bundle.xcarchive
-      #     path: build/fapp.xcarchive
-      #  - name: Create Github Release
-      #    uses: softprops/action-gh-release@v2
-      #    with:
-      #      generate_release_notes: true
-      #      prerelease: true
-      #      files: |
-      #        app/build/outputs/apk/release/app-release.apk
-      #        app/build/outputs/bundle/release/app-release.aab
+      - name: Publishing iOS artefacts for signing and releasing later
+        uses: actions/upload-artifact@v4
+        with:
+          name: fapp-bundle.xcarchive
+          path: build/fapp.xcarchive
+       - name: Create Github Release
+         uses: softprops/action-gh-release@v2
+         with:
+           generate_release_notes: true
+           prerelease: true
+           files: |
+             build/fapp.xcarchive
 
-      - name: Creating GitHub Release artefacts for signing and releasing later
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }} (prelease) # ${{ github.event.release.tag_name }} 
-          draft: false
-          prerelease: true
-      - uses: xresloader/upload-to-github-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          file: 'build/fapp.xcarchive'
-          prerelease: true
-          tags: true
-          draft: false
-          verbose: true
-          release_id: ${{ steps.create_release.outputs.id }}
+      # - name: Creating GitHub Release artefacts for signing and releasing later
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ github.ref_name }}
+      #     release_name: Release ${{ github.ref_name }} (prelease) # ${{ github.event.release.tag_name }} 
+      #     draft: false
+      #     prerelease: true
+      # - uses: xresloader/upload-to-github-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     file: 'build/fapp.xcarchive'
+      #     prerelease: true
+      #     tags: true
+      #     draft: false
+      #     verbose: true
+      #     release_id: ${{ steps.create_release.outputs.id }}
 
       ### Skipping Cleanup: removing the certificate and provisioning profile from the runner because of no certificates.
