@@ -1,0 +1,57 @@
+name: 'Flutter/Swift iOS app: build and publish'
+on: 
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      ### Skipping installing the Apple certificate and provisioning profile. Not neccesary for this case.
+      ### Apple Developer Program Enrollment: We are unable to process your request. An unknown error occurred.
+      ### - name: Installing Apple certificate
+      ###   uses: apple-actions/import-codesign-certs@v2
+      ###   with:
+      ###     p12-file-base64: ${{ secrets.P12_BASE64 }}
+      ###     p12-password: ${{ secrets.P12_PASSWORD }}
+      ### - name: Installing the provisioning profile
+      ### ...
+
+      - name: Installing Flutter environment
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.19.0
+
+      - name: Getting the current package's dependencies
+        run: flutter pub get
+
+      - name: Building an iOS archive bundle (without IPA for distribution)
+        run: flutter build ipa --release --no-codesign --export-method ad-hoc --verbose
+
+      - name: Build resolve Swift dependencies
+        run: xcodebuild -resolvePackageDependencies -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release
+
+      - name: Build xcArchive for re-signing it from the client's side with their own profile and certificate
+        run: |
+          xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release  -sdk 'iphoneos' -destination 'generic/platform=iOS' -archivePath build/fapp.xcarchive clean archive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_ENTITLEMENTS=""
+
+      ### Skipping an archive distribution because of no certificates
+      ### - name: Exporting ipa
+      ###   run: xcodebuild -exportArchive -archivePath build/fapp.xcarchive -exportOptionsPlist ios/ExportOptions.plist -exportPath build-ipa/fapp.ipa
+
+      - name: Publishing iOS artefacts for signing and releasing later
+        uses: actions/upload-artifact@v4
+        with:
+          name: fapp-prerelease-bundle
+          path: build/fapp.xcarchive
+
+      ### Skipping Cleanup: removing the certificate and provisioning profile from the runner because of no certificates.
