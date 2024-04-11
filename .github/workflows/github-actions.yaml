@@ -24,8 +24,7 @@ jobs:
       - name: Installing Flutter environment
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
-          flutter-version: 3.19.0
+          flutter-version: 3.19.5
 
       - name: Getting the current package's dependencies
         run: flutter pub get
