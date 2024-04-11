@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>method</key>
+  <!-- Command line name "ad-hoc" is deprecated. Use "release-testing" instead. -->
+  <string>release-testing</string> <!-- app-store, validation, ad-hoc, package, enterprise, development, developer-id, and mac-application -->
+  <key>teamID</key>
+  <string>YOUR_TEAM_ID</string>
+    <key>signingStyle</key>
+    <string>manual</string>
+  <key>provisioningProfiles</key>
+    <dict>
+        <key>YOUR_BUNDLE_ID</key>
+        <string>YOUR_UUID</string>
+    </dict>
+</dict>
+</plist>
