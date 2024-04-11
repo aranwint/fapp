@@ -30,7 +30,7 @@ jobs:
         run: flutter pub get
 
       - name: Building an iOS archive bundle (without IPA for distribution)
-        run: flutter build ipa --release --no-codesign --export-method ad-hoc --verbose
+        run: flutter build ipa --release --no-codesign --export-method ad-hoc
 
       - name: Build resolve Swift dependencies
         run: xcodebuild -resolvePackageDependencies -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release
@@ -50,8 +50,8 @@ jobs:
       # - name: Publishing iOS artefacts for signing and releasing later
       #   uses: actions/upload-artifact@v4
       #   with:
-      #     name: fapp-prerelease-bundle
-      #     path: build/
+      #     name: fapp-bundle.xcarchive
+      #     path: build/fapp.xcarchive
 
       - name: Creating GitHub Release artefacts for signing and releasing later
         id: create_release
@@ -59,7 +59,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}-prelease
+          tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }} (prelease)
           draft: false
           prerelease: true
