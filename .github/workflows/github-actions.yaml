@@ -53,7 +53,7 @@ jobs:
       ###   run: xcodebuild -exportArchive -archivePath build/fapp.xcarchive -exportOptionsPlist ios/ExportOptions.plist -exportPath build-ipa/fapp.ipa
 
       - name: Archiving
-        run: zip -r fapp.xcarchive.zip build/fapp.xcarchive/
+        run: zip --quiet --recurse-paths fapp.xcarchive.zip build/fapp.xcarchive/
 
       - name: Creating Github Release artefacts for signing and releasing later
         uses: softprops/action-gh-release@v2
