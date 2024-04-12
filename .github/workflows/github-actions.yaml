@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+      - name: Current release version ${{ github.ref_name }}
+        run: echo ${{ github.ref_name }}
 
       ### Skipping installing the Apple certificate and provisioning profile. Not neccesary for this case.
       ### Apple Developer Program Enrollment: We are unable to process your request. An unknown error occurred.
