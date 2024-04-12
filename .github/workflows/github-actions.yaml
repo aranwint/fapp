@@ -4,7 +4,7 @@ on:
     branches:
       - master
     tags:        
-      - '**' 
+      - "v${{ env.RELEASE_VERSION }}"
 
 jobs:
   build:
@@ -65,7 +65,7 @@ jobs:
       - name: Creating Github Release artefacts for signing and releasing later by the client
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: "v${{ env.RELEASE_VERSION }}"
           generate_release_notes: true
           prerelease: true
           files: |
