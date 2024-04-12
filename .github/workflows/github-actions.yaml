@@ -12,8 +12,12 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      - name: "Current release $(date +%y.%m.%d)-${{ github.run_number }} from ${{ github.ref_name }}"
-        run: echo ${{ github.ref_name }}
+      - name: Setting release version
+        id: set-release-version
+        run: |
+          echo "RELEASE_VERSION="$(date +%y.%m.%d).${{ github.run_number }}" >> $GITHUB_ENV
+          echo "RELEASE_DATE="$(date +%y.%m.%d)" >> $GITHUB_ENV
+      - name: "Current release ${{ env.RELEASE_VERSION }} from ${{ github.ref_name }}"
 
       ### Skipping installing the Apple certificate and provisioning profile. Not neccesary for this case.
       ### Apple Developer Program Enrollment: We are unable to process your request. An unknown error occurred.
@@ -34,33 +38,36 @@ jobs:
         run: flutter pub get
 
       - name: Building an iOS archive bundle (without IPA for distribution)
-        run: flutter build ipa --release --build-number "${{ github.run_number }}" --build-name="$(date +%y.%m.%d)" --no-codesign --export-method ad-hoc
+        run: flutter build ipa --release --build-number "${{ github.run_number }}" --build-name="${{ env.RELEASE_DATE }}" --no-codesign --export-method ad-hoc 
 
-      - name: Build resolve Swift dependencies
-        run: xcodebuild -resolvePackageDependencies -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release
-
-      - name: Build xcArchive for re-signing it from the client's side with their own profile and certificate
-        run: |
-          xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release  -sdk 'iphoneos' -destination 'generic/platform=iOS' -archivePath build/fapp."${{ github.run_number }}".xcarchive clean archive \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGN_ENTITLEMENTS="" 
-
+      ### Extra xcodebuild steps, not using xcodebuild for this case.
+      # - name: Build resolve Swift dependencies
+      #   run: xcodebuild -resolvePackageDependencies -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release
+      #
+      # - name: Build xcArchive for re-signing it from the client's side with their own profile and certificate
+      #   run: |
+      #     xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release  -sdk 'iphoneos' -destination 'generic/platform=iOS' -archivePath build/fapp.${{ env.RELEASE_VERSION }}.xcarchive clean archive \
+      #       CODE_SIGN_IDENTITY="" \
+      #       CODE_SIGNING_REQUIRED=NO \
+      #       CODE_SIGNING_ALLOWED=NO \
+      #       CODE_SIGN_ENTITLEMENTS="" 
+      #
       ### Skipping an archive distribution because of no certificates
       ### - name: Exporting ipa
-      ###   run: xcodebuild -exportArchive -archivePath build/fapp.xcarchive -exportOptionsPlist ios/ExportOptions.plist -exportPath build-ipa/fapp.ipa
+      ###   run: xcodebuild -exportArchive -archivePath build/fapp.${{ env.RELEASE_VERSION }}.xcarchive -exportOptionsPlist ios/ExportOptions.plist -exportPath build-ipa/fapp.${{ env.RELEASE_VERSION }}.ipa
 
+      - name: Post-build bundle renaming
+        run: mv build/ios/archive/Runner.xcarchive ./fapp.${{ env.RELEASE_VERSION }}.xcarchive
       - name: Archiving
-        run: zip --quiet --recurse-paths fapp.xcarchive."$(date +%y.%m.%d)".zip build/fapp."${{ github.run_number }}".xcarchive/
+        run: zip --quiet --recurse-paths fapp.${{ env.RELEASE_VERSION }}.xcarchive.zip ./fapp.${{ env.RELEASE_VERSION }}.xcarchive/
 
-      - name: Creating Github Release artefacts for signing and releasing later
+      - name: Creating Github Release artefacts for signing and releasing later by the client
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           generate_release_notes: true
           prerelease: true
           files: |
-            fapp.xcarchive.zip
+            fapp.${{ env.RELEASE_VERSION }}.xcarchive.zip
 
-      ### Skipping Cleanup: removing the certificate and provisioning profile from the runner because of no certificates.
+      ### Skipping Cleanup: removing the certificate and provisioning profile from the runner because of no certificates for this case.
