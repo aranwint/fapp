@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - master
+    tags:        
+      - '**' 
 
 jobs:
   build:
@@ -10,11 +12,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      - name: Setting latest tag
-        id: set-latest-tag
-        run: echo "latest_tag=$(git tag | sort --version-sort | tail -n1)" >> $GITHUB_ENV
-      - name: Current release version ${{ github.ref_name }}
-        run: echo ${{ github.ref_name }} - ${{ env.latest_tag }}
+      - name: Current release is ${{ github.ref_name }}
+        run: echo ${{ github.ref_name }}
 
       ### Skipping installing the Apple certificate and provisioning profile. Not neccesary for this case.
       ### Apple Developer Program Enrollment: We are unable to process your request. An unknown error occurred.
