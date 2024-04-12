@@ -37,7 +37,7 @@ jobs:
 
       - name: Build xcArchive for re-signing it from the client's side with their own profile and certificate
         run: |
-          xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release  -sdk 'iphoneos17.4' -destination 'generic/platform=iOS' -archivePath build/fapp.xcarchive clean archive \
+          xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release  -sdk 'iphoneos' -destination 'generic/platform=iOS' -archivePath build/fapp.xcarchive clean archive \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
