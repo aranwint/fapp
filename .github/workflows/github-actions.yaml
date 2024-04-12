@@ -18,7 +18,7 @@ jobs:
           echo "RELEASE_VERSION="$(date +%y.%m.%d).${{ github.run_number }}" >> $GITHUB_ENV
           echo "RELEASE_DATE="$(date +%y.%m.%d)" >> $GITHUB_ENV
       - name: "Current release ${{ env.RELEASE_VERSION }} from ${{ github.ref_name }}"
-        run: echo Current release ${{ env.RELEASE_VERSION }} from ${{ github.ref_name }}"
+        run: echo "Current release ${{ env.RELEASE_VERSION }} from ${{ github.ref_name }}"
 
       ### Skipping installing the Apple certificate and provisioning profile. Not neccesary for this case.
       ### Apple Developer Program Enrollment: We are unable to process your request. An unknown error occurred.
