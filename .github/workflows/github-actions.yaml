@@ -10,8 +10,11 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+      - name: Setting latest tag
+        id: set-latest-tag
+        run: echo "latest_tag=$(git tag | sort --sort=taggerdate | tail -n1)" >> $GITHUB_ENV
       - name: Current release version ${{ github.ref_name }}
-        run: echo ${{ github.ref_name }}
+        run: echo ${{ github.ref_name }} - ${{ env.latest_tag }}
 
       ### Skipping installing the Apple certificate and provisioning profile. Not neccesary for this case.
       ### Apple Developer Program Enrollment: We are unable to process your request. An unknown error occurred.
@@ -55,7 +58,7 @@ jobs:
       - name: Creating Github Release artefacts for signing and releasing later
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ env.latest_tag }}
           generate_release_notes: true
           prerelease: true
           files: |
