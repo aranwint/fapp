@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Setting latest tag
         id: set-latest-tag
-        run: echo "latest_tag=$(git tag | sort --sort=taggerdate | tail -n1)" >> $GITHUB_ENV
+        run: echo "latest_tag=$(git tag | sort --version-sort | tail -n1)" >> $GITHUB_ENV
       - name: Current release version ${{ github.ref_name }}
         run: echo ${{ github.ref_name }} - ${{ env.latest_tag }}
 
