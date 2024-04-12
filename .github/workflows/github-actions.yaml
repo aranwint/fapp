@@ -47,11 +47,9 @@ jobs:
       ### - name: Exporting ipa
       ###   run: xcodebuild -exportArchive -archivePath build/fapp.xcarchive -exportOptionsPlist ios/ExportOptions.plist -exportPath build-ipa/fapp.ipa
 
-      - name: Publishing iOS artefacts for signing and releasing later
-        uses: actions/upload-artifact@v4
-        with:
-          name: fapp-bundle.xcarchive
-          path: build/fapp.xcarchive
+      - name: Archiving
+        run: zip -r fapp.xcarchive.zip build/fapp.xcarchive/
+
       - name: Creating Github Release artefacts for signing and releasing later
         uses: softprops/action-gh-release@v2
         with:
@@ -59,6 +57,6 @@ jobs:
           generate_release_notes: true
           prerelease: true
           files: |
-            build/fapp.xcarchive
+            fapp.xcarchive.zip
 
       ### Skipping Cleanup: removing the certificate and provisioning profile from the runner because of no certificates.
