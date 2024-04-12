@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - master
-    tags:        
-      - "v${{ env.RELEASE_VERSION }}"
+    tags:
+      - '**'
 
 jobs:
   build:
