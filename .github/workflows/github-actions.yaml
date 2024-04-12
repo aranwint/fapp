@@ -34,14 +34,14 @@ jobs:
         run: flutter pub get
 
       - name: Building an iOS archive bundle (without IPA for distribution)
-        run: flutter build ipa --release --no-codesign --export-method ad-hoc
+        run: flutter build ipa --release --build-number "$(date +%s)" --build-name="$(date +%y.%m.%d)" --no-codesign --export-method ad-hoc
 
       - name: Build resolve Swift dependencies
         run: xcodebuild -resolvePackageDependencies -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release
 
       - name: Build xcArchive for re-signing it from the client's side with their own profile and certificate
         run: |
-          xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release  -sdk 'iphoneos' -destination 'generic/platform=iOS' -archivePath build/fapp.xcarchive clean archive \
+          xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release  -sdk 'iphoneos' -destination 'generic/platform=iOS' -archivePath build/fapp."$(date +%s)".xcarchive clean archive \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
@@ -52,7 +52,7 @@ jobs:
       ###   run: xcodebuild -exportArchive -archivePath build/fapp.xcarchive -exportOptionsPlist ios/ExportOptions.plist -exportPath build-ipa/fapp.ipa
 
       - name: Archiving
-        run: zip --quiet --recurse-paths fapp.xcarchive.zip build/fapp.xcarchive/
+        run: zip --quiet --recurse-paths fapp.xcarchive."$(date +%y.%m.%d)".zip build/fapp."$(date +%s)".xcarchive/
 
       - name: Creating Github Release artefacts for signing and releasing later
         uses: softprops/action-gh-release@v2
