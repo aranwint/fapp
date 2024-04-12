@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - master
-    # tags:
-    #   - '**'
+    tags:
+      - '**'
 
 jobs:
   build:
@@ -58,9 +58,9 @@ jobs:
       ###   run: xcodebuild -exportArchive -archivePath build/fapp.${{ env.RELEASE_VERSION }}.xcarchive -exportOptionsPlist ios/ExportOptions.plist -exportPath build-ipa/fapp.${{ env.RELEASE_VERSION }}.ipa
 
       - name: Post-build bundle renaming
-        run: mv build/ios/archive/Runner.xcarchive "./fapp.${{ env.RELEASE_VERSION }}.xcarchive"
+        run: mv build/ios/archive/Runner.xcarchive ./fapp.${{ env.RELEASE_VERSION }}.xcarchive
       - name: Archiving
-        run: zip --quiet --recurse-paths "fapp.${{ env.RELEASE_VERSION }}.xcarchive.zip" "./fapp.${{ env.RELEASE_VERSION }}.xcarchive/"
+        run: zip --quiet --recurse-paths fapp.${{ env.RELEASE_VERSION }}.xcarchive.zip ./fapp.${{ env.RELEASE_VERSION }}.xcarchive/
 
       - name: Creating Github Release artefacts for signing and releasing later by the client
         uses: softprops/action-gh-release@v2
@@ -69,6 +69,6 @@ jobs:
           generate_release_notes: true
           prerelease: true
           files: |
-            "fapp.${{ env.RELEASE_VERSION }}.xcarchive.zip"
+            fapp.${{ env.RELEASE_VERSION }}.xcarchive.zip
 
       ### Skipping Cleanup: removing the certificate and provisioning profile from the runner because of no certificates for this case.
